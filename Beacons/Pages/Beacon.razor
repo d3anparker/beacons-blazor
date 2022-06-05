@@ -1,0 +1,16 @@
+﻿@page "/beacon"
+
+<h3>Beacon</h3>
+
+@if (Position is null)
+{
+    <div>
+        Current position unknown.
+    </div>
+}
+else
+{
+    <div>
+        Current position is: @Position.Latitude, @Position.Longitude
+    </div>
+}
