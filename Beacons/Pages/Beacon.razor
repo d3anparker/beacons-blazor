@@ -10,7 +10,14 @@
 }
 else
 {
-    <div>
+    <div class="mb-3">
         Current position is: @Position.Coords.Latitude, @Position.Coords.Longitude
     </div>
+
+    @if (Watching)
+    {
+        <button class="button" @onclick="() => StopWatchAsync()">Stop watching</button>
+    } else {
+        <button class="button" @onclick="() => StartWatchAsync()">Start watching</button>
+    }
 }

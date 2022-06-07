@@ -1,0 +1,16 @@
+{
+  "compileOnSave": true,
+  "compilerOptions": {
+    "noImplicitAny": false,
+    "noEmitOnError": true,
+    "removeComments": false,
+    "sourceMap": true,
+    "target": "es5",
+    "outFile": "wwwroot/js/beacons.js",
+    "module": "amd",
+    "lib": ["ES2015", "DOM"]
+  },
+  "include": [
+    "Scripts/**/*"
+  ]
+}
