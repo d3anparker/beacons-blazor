@@ -22,27 +22,9 @@
         <a href="" class="reload">Reload</a>
         <a class="dismiss">🗙</a>
     </div>
+    <script type="text/javascript" src="js/watch.js"></script>
     <script src="_framework/blazor.webassembly.js"></script>
     <script>navigator.serviceWorker.register('service-worker.js');</script>
-    <script>
-        window.startWatch = (beacon) => {
-            if (!navigator.geolocation) {
-                return setGeoLocationUnavailable();
-            }
-
-            navigator.geolocation.watchPosition((position) => {
-                return setPosition(position);
-            });
-
-            const setPosition = async (position) => {
-                return await beacon.invokeMethodAsync("SetLatestPosition", position)
-            }
-
-            const setGeoLocationUnavailable = async () => {
-                return await beacon.invokeMethodAsync("SetGeoLocationNotAvailable");
-            }
-        }
-    </script>
 </body>
 
 </html>

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Components;
+﻿using Beacons.Models;
+using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 
 namespace Beacons.Pages
@@ -33,12 +34,7 @@ namespace Beacons.Pages
         public void SetLatestPosition(Position position)
         {
             Position = position;
+            StateHasChanged();
         }
-    }
-
-    public class Position
-    {
-        public double Latitude { get; set; }
-        public double Longitude { get; set; }
     }
 }
