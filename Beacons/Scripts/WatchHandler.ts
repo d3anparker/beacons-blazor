@@ -1,42 +1,25 @@
-﻿import { DotNetObject } from "./DotNetObject";
+﻿import { Beacon } from "./Beacon";
 
 export class WatchHandler {
+    private readonly _options: PositionOptions = {
+        enableHighAccuracy: true,
+        maximumAge: 5000 // 5 seconds.
+    };
 
-    constructor(private beacon: DotNetObject, private navigator: Navigator) {
-    }
-    
-    setPosition = async (position) => {
-        const response = {
-            coords: {
-                longitude: position.coords.longitude,
-                latitude: position.coords.latitude
-            }
-        };
-
-        return await this.beacon.invokeMethodAsync("SetLatestPosition", response);
-    }
-
-    setGeoLocationUnavailable = async () => {
-        return await this.beacon.invokeMethodAsync("SetGeoLocationNotAvailable");
-    }
+    constructor(private beacon: Beacon, private navigator: Navigator) {
+    }  
 
     startWatch = async () : Promise<number> => {
         if (!this.navigator.geolocation) {
-            await this.setGeoLocationUnavailable();
+            await this.beacon.setGeoLocationUnavailable();
 
             return -1;
         }
 
-        const options: PositionOptions = {
-            enableHighAccuracy: true,
-            maximumAge: 5000 // 5 seconds.
-        };
-
-        return this.navigator.geolocation.watchPosition((position) => this.setPosition(position), () => { }, options);
+        return this.navigator.geolocation.watchPosition((position) => this.beacon.setPosition(position), () => { }, this._options);
     }
 
-    stopWatch = (id) => {
+    stopWatch = (id: number) => {
         this.navigator.geolocation.clearWatch(id);
     }
 }
-
