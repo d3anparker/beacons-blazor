@@ -1,4 +1,4 @@
-﻿import { DotNetObject } from "./DotNetObject";
+﻿import { DotNetObject } from "./DotNetObject.js";
 
 export class Beacon {
     constructor(private beacon: DotNetObject) { }

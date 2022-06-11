@@ -4,7 +4,7 @@ using Microsoft.JSInterop;
 
 namespace Beacons.Pages
 {
-    public partial class Beacon : ComponentBase
+    public partial class Beacon : ComponentBase, IAsyncDisposable
     {
         [Inject]
         public IJSRuntime Js { get; set; }
@@ -14,6 +14,7 @@ namespace Beacons.Pages
         private int _watchId;
 
         private readonly DotNetObjectReference<Beacon> _reference;
+        private IJSObjectReference? _module;
 
         public Beacon()
         {
@@ -21,22 +22,35 @@ namespace Beacons.Pages
             GeoLocationAvailable = true;
         }
 
-        protected override async Task OnInitializedAsync()
+        protected override async Task OnAfterRenderAsync(bool firstRender)
         {
-            await StartWatchAsync();
-            await base.OnInitializedAsync();
+            if(firstRender)
+            {
+                await LoadModuleAsync();
+                await StartWatchAsync();
+            }
         }
 
         public async Task StartWatchAsync()
         {
-            _watchId = await Js.InvokeAsync<int>("startWatch", _reference);
+            if(_module is null)
+            {
+                throw new InvalidOperationException("Module not loaded");
+            }
+
+            _watchId = await _module.InvokeAsync<int>("startWatch", _reference);
             Watching = true;
             StateHasChanged();
         }
 
         public async Task StopWatchAsync()
         {
-            await Js.InvokeVoidAsync("stopWatch", _reference, _watchId);
+            if (_module is null)
+            {
+                throw new InvalidOperationException("Module not loaded");
+            }
+
+            await _module.InvokeVoidAsync("stopWatch", _reference, _watchId);
             Watching = false;
             StateHasChanged();
         }
@@ -54,6 +68,17 @@ namespace Beacons.Pages
             StateHasChanged();
         }
 
-        
+        public async ValueTask DisposeAsync()
+        {
+            if(_module is not null)
+            {
+                await _module.DisposeAsync();
+            }
+        }
+
+        private async Task LoadModuleAsync()
+        {
+            _module = await Js.InvokeAsync<IJSObjectReference>("import", "./js/main.js");
+        }
     }
 }

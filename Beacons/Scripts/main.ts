@@ -1,14 +1,14 @@
-﻿import { Beacon } from './Beacon';
-import { DotNetObject } from './DotNetObject';
-import { WatchHandler } from './WatchHandler';
+﻿import { Beacon } from './Beacon.js';
+import { DotNetObject } from './DotNetObject.js';
+import { WatchHandler } from './WatchHandler.js';
 
-(window as any).startWatch = (beacon: DotNetObject) => {
+export function startWatch(beacon: DotNetObject) {
     const handler = new WatchHandler(new Beacon(beacon), window.navigator);
 
-    return handler.startWatch();   
+    return handler.startWatch();
 }
 
-(window as any).stopWatch = (beacon: DotNetObject, id: number) => {
+export function stopWatch(beacon: DotNetObject, id: number) {
     const handler = new WatchHandler(new Beacon(beacon), window.navigator);
 
     handler.stopWatch(id);

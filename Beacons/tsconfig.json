@@ -7,7 +7,7 @@
     "sourceMap": true,
     "target": "ES6",
     "outDir": "wwwroot/js",
-    "lib": ["ES2015", "DOM"]
+    "lib": [ "ES2015", "DOM" ]
   },
   "include": [
     "Scripts/**/*"

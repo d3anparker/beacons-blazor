@@ -1,4 +1,4 @@
-﻿import { Beacon } from "./Beacon";
+﻿import { Beacon } from "./Beacon.js";
 
 export class WatchHandler {
     private readonly _options: PositionOptions = {
