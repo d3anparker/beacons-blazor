@@ -44,5 +44,20 @@ async function onFetch(event) {
         cachedResponse = await cache.match(request);
     }
 
+    if (cachedResponse && cachedResponse.redirected) {
+        cachedResponse = await cleanResponse(cachedResponse);
+    }
+
     return cachedResponse || fetch(event.request);
+}
+
+// https://stackoverflow.com/questions/56903357/restrictions-around-30x-redirects-in-a-service-workers-fetch-handler
+async function cleanResponse(response) {
+    const clonedResponse = response.clone();
+
+    return new Response(await clonedResponse.blob(), {
+        headers: clonedResponse.headers,
+        status: clonedResponse.status,
+        statusText: clonedResponse.statusText,
+    });
 }
