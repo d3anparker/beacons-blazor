@@ -16,7 +16,7 @@ export class WatchHandler {
             return -1;
         }
 
-        return this.navigator.geolocation.watchPosition((position) => this.beacon.setPosition(position), () => { }, this._options);
+        return this.navigator.geolocation.watchPosition((position: GeolocationPosition) => this.beacon.setPosition(position), () => { }, this._options);
     }
 
     stopWatch = (id: number) => {

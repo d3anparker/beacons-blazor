@@ -1,4 +1,5 @@
 ﻿using Beacons.Models;
+using Beacons.Services;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 
@@ -6,20 +7,26 @@ namespace Beacons.Pages
 {
     public partial class Beacon : ComponentBase, IAsyncDisposable
     {
-        [Inject]
-        public IJSRuntime Js { get; set; }
-        public bool GeoLocationAvailable { get; set; }
-        public Position? Position { get; set; }
-        public bool Watching { get; set; }
+        [Inject] private IJSRuntime Js { get; set; } = default!;
+        [Inject] private IBeaconService BeaconService { get; set; }
+        [Parameter] public Guid BeaconId { get; set; }
+
+        private Models.Beacon? beacon;
+        private bool geoLocationAvailable { get; set; }
+        private Position? currentPosition { get; set; }
+        private bool watching { get; set; }
         private int _watchId;
 
-        private readonly DotNetObjectReference<Beacon> _reference;
         private IJSObjectReference? _module;
 
         public Beacon()
         {
-            _reference = DotNetObjectReference.Create(this);
-            GeoLocationAvailable = true;
+            geoLocationAvailable = true;
+        }
+
+        protected override async Task OnInitializedAsync()
+        {
+            beacon = await BeaconService.GetByIdAsync(BeaconId);
         }
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -38,8 +45,8 @@ namespace Beacons.Pages
                 throw new InvalidOperationException("Module not loaded");
             }
 
-            _watchId = await _module.InvokeAsync<int>("startWatch", _reference);
-            Watching = true;
+            _watchId = await _module.InvokeAsync<int>("startWatch");
+            watching = true;
             StateHasChanged();
         }
 
@@ -50,21 +57,21 @@ namespace Beacons.Pages
                 throw new InvalidOperationException("Module not loaded");
             }
 
-            await _module.InvokeVoidAsync("stopWatch", _reference, _watchId);
-            Watching = false;
+            await _module.InvokeVoidAsync("stopWatch", _watchId);
+            watching = false;
             StateHasChanged();
         }
 
         [JSInvokable]
         public void SetGeoLocationNotAvailable()
         {
-            GeoLocationAvailable = false;
+            geoLocationAvailable = false;
         }
 
         [JSInvokable]
         public void SetLatestPosition(Position position)
         {
-            Position = position;
+            currentPosition = position;
             StateHasChanged();
         }
 
@@ -78,7 +85,10 @@ namespace Beacons.Pages
 
         private async Task LoadModuleAsync()
         {
-            _module = await Js.InvokeAsync<IJSObjectReference>("import", "./js/main.js");
+            var module = await Js.InvokeAsync<IJSObjectReference>("import", "./js/main.js");
+            await module.InvokeVoidAsync("initialise", DotNetObjectReference.Create(this));
+
+            _module = module;
         }
     }
 }

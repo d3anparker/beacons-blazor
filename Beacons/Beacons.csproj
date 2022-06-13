@@ -36,15 +36,15 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="wwwroot\js\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <None Include="Scripts\WatchHandler.ts" />
   </ItemGroup>
 
   <ItemGroup>
     <TypeScriptCompile Include="tsconfig.json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="wwwroot\js\" />
   </ItemGroup>
 
 </Project>

@@ -2,14 +2,24 @@
 import { DotNetObject } from './DotNetObject.js';
 import { WatchHandler } from './WatchHandler.js';
 
-export function startWatch(beacon: DotNetObject) {
-    const handler = new WatchHandler(new Beacon(beacon), window.navigator);
+let handler: WatchHandler
+
+export function initialise(beacon: DotNetObject) {
+    handler = new WatchHandler(new Beacon(beacon), window.navigator);
+}
+
+export function startWatch() {
+    if (!handler) {
+        throw Error("Module not initialised");
+    }
 
     return handler.startWatch();
 }
 
-export function stopWatch(beacon: DotNetObject, id: number) {
-    const handler = new WatchHandler(new Beacon(beacon), window.navigator);
+export function stopWatch(id: number) {
+    if (!handler) {
+        throw Error("Module not initialised");
+    }
 
     handler.stopWatch(id);
 }

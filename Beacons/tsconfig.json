@@ -1,13 +1,15 @@
 {
   "compileOnSave": true,
   "compilerOptions": {
+    "checkJs": true,
     "noImplicitAny": true,
     "noEmitOnError": true,
     "removeComments": false,
     "sourceMap": true,
-    "target": "ES6",
+    "target": "ES2017",
     "outDir": "wwwroot/js",
-    "lib": [ "ES2015", "DOM" ]
+    "lib": [ "ES2015", "DOM" ],
+    "module": "ES2015"
   },
   "include": [
     "Scripts/**/*"

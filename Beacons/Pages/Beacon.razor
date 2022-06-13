@@ -1,23 +1,39 @@
-﻿@page "/beacon"
+﻿@page "/beacon/{beaconId:guid}"
 
 <h3>Beacon</h3>
 
-@if (Position is null)
+@if (beacon is null)
 {
     <div>
-        Current position unknown.
+        No beacon active
     </div>
 }
 else
 {
-    <div class="mb-3">
-        Current position is: @Position.Coords.Latitude, @Position.Coords.Longitude
+    <div>
+        Active beacon: Lat: @beacon.Coords.Latitude, Long: @beacon.Coords.Longitude
     </div>
 
-    @if (Watching)
+
+    @if (currentPosition is null)
     {
-        <button class="button" @onclick="() => StopWatchAsync()">Stop watching</button>
-    } else {
-        <button class="button" @onclick="() => StartWatchAsync()">Start watching</button>
+        <div>
+            Current position unknown.
+        </div>
+    }
+    else
+    {
+        <div class="mb-3">
+            Current position is: Lat: @currentPosition.Coords.Latitude, Long: @currentPosition.Coords.Longitude
+        </div>
+
+        @if (watching)
+        {
+            <button class="button" @onclick="() => StopWatchAsync()">Stop watching</button>
+        }
+        else
+        {
+            <button class="button" @onclick="() => StartWatchAsync()">Start watching</button>
+        }
     }
 }
