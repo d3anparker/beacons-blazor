@@ -1,6 +1,6 @@
 ﻿using Beacons.Models;
 
-namespace Beacons.Services
+namespace Beacons.Services.Beacons
 {
     public interface IBeaconService
     {

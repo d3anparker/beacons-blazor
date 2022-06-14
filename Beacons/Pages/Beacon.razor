@@ -1,4 +1,5 @@
 ﻿@page "/beacon/{beaconId:guid}"
+@using Beacons.Models
 
 <h3>Beacon</h3>
 
@@ -26,6 +27,25 @@ else
         <div class="mb-3">
             Current position is: Lat: @currentPosition.Coords.Latitude, Long: @currentPosition.Coords.Longitude
         </div>
+
+        <div class="mb-3">
+            Distance to target is @currentDistance
+        </div>
+        <div class="mb-3">
+            <input type="radio" class="btn-check" name="options" id="option1"
+                autocomplete="off"
+                checked="@(_displayedIn == DistanceUnit.Metric)"
+                @onchange="ChangeUnit"
+                value="@((int)DistanceUnit.Metric)">
+            <label class="btn btn-primary" for="option1">KM</label>
+
+            <input type="radio" class="btn-check" name="options" id="option2"
+                autocomplete="off"
+                checked="@(_displayedIn == DistanceUnit.Imperial)"
+                @onchange="ChangeUnit"
+                value="@((int)DistanceUnit.Imperial)">
+            <label class="btn btn-primary" for="option2">Miles</label>
+        </div>        
 
         @if (watching)
         {

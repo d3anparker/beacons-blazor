@@ -1,4 +1,4 @@
-﻿using Beacons.Services;
+﻿using Beacons.Services.Beacons;
 
 namespace Beacons.Test
 {

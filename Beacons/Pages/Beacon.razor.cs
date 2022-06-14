@@ -1,5 +1,6 @@
 ﻿using Beacons.Models;
-using Beacons.Services;
+using Beacons.Services.Beacons;
+using Beacons.Services.Distances;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 
@@ -9,6 +10,8 @@ namespace Beacons.Pages
     {
         [Inject] private IJSRuntime Js { get; set; } = default!;
         [Inject] private IBeaconService BeaconService { get; set; }
+        [Inject] private IDistanceCalculator DistanceCalculator { get; set; }
+
         [Parameter] public Guid BeaconId { get; set; }
 
         private Models.Beacon? beacon;
@@ -16,6 +19,9 @@ namespace Beacons.Pages
         private Position? currentPosition { get; set; }
         private bool watching { get; set; }
         private int _watchId;
+        private DistanceResponse _distance;
+        private DistanceUnit _displayedIn;
+        private string currentDistance => _displayedIn == DistanceUnit.Metric ? $"{_distance.MetricDistance} KM" : $"{_distance.ImperialDistance} miles";
 
         private IJSObjectReference? _module;
 
@@ -33,7 +39,7 @@ namespace Beacons.Pages
         {
             if(firstRender)
             {
-                await LoadModuleAsync();
+                _module = await LoadModuleAsync();
                 await StartWatchAsync();
             }
         }
@@ -72,6 +78,16 @@ namespace Beacons.Pages
         public void SetLatestPosition(Position position)
         {
             currentPosition = position;
+
+            var request = new CalculateDistanceRequest()
+            {
+                CurrentCoords = position.Coords,
+                DestinationCoords = beacon.Coords,
+            };
+
+            var response = DistanceCalculator.CalculateDistance(request);
+            _distance = response;
+
             StateHasChanged();
         }
 
@@ -83,12 +99,23 @@ namespace Beacons.Pages
             }
         }
 
-        private async Task LoadModuleAsync()
+        public void ChangeUnit(ChangeEventArgs e)
+        {
+            if(e.Value is null)
+            {
+                return;
+            }
+
+            _displayedIn = Enum.Parse<DistanceUnit>(e.Value.ToString());
+            StateHasChanged();
+        }
+
+        private async Task<IJSObjectReference> LoadModuleAsync()
         {
             var module = await Js.InvokeAsync<IJSObjectReference>("import", "./js/main.js");
             await module.InvokeVoidAsync("initialise", DotNetObjectReference.Create(this));
 
-            _module = module;
+            return module;
         }
     }
 }
