@@ -1,0 +1,22 @@
+﻿@page "/create"
+@using Beacons.Services.BeaconSharing
+@inject IBeaconSharingService _beaconSharingService;
+@inject NavigationManager _navigationManager;
+
+<h3>CreateBeacon</h3>
+
+<button type="button" @onclick="(e) => Click(e)">Share</button>
+
+@code {
+    public async Task Click(MouseEventArgs e)
+    {
+        var request = new ShareDataRequest
+        {
+            Title = "Come and find me!",
+            Text = "I'll be waiting here!",
+            Url = _navigationManager.ToAbsoluteUri($"/beacon/{Guid.NewGuid()}").ToString()
+        };
+
+        await _beaconSharingService.ShareBeaconAsync(request);
+    }
+}

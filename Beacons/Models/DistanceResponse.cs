@@ -4,6 +4,7 @@
     {
         public double MetricDistance { get; }
         public double ImperialDistance { get; }
+        public double Accuracy { get; set; }
 
         public DistanceResponse(double distance)
         {

@@ -26,7 +26,10 @@ namespace Beacons.Services.Distances
 
             double c = 2 * Math.Asin(Math.Sqrt(a));
 
-            return new DistanceResponse(c);
+            return new DistanceResponse(c)
+            {
+                Accuracy = request.CurrentCoords.Accuracy
+            };
         }
     }
 }

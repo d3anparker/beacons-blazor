@@ -1,6 +1,7 @@
 ﻿using Beacons.Models;
 using Beacons.Services.Beacons;
 using Beacons.Services.Distances;
+using Beacons.ViewModels;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 
@@ -15,19 +16,16 @@ namespace Beacons.Pages
         [Parameter] public Guid BeaconId { get; set; }
 
         private Models.Beacon? beacon;
-        private bool geoLocationAvailable { get; set; }
-        private Position? currentPosition { get; set; }
-        private bool watching { get; set; }
-        private int _watchId;
-        private DistanceResponse _distance;
-        private DistanceUnit _displayedIn;
-        private string currentDistance => _displayedIn == DistanceUnit.Metric ? $"{_distance.MetricDistance} KM" : $"{_distance.ImperialDistance} miles";
+        private readonly BeaconViewModel _model;
 
         private IJSObjectReference? _module;
 
         public Beacon()
         {
-            geoLocationAvailable = true;
+            _model = new BeaconViewModel()
+            {
+                GeoLocationAvailable = true
+            };
         }
 
         protected override async Task OnInitializedAsync()
@@ -37,7 +35,7 @@ namespace Beacons.Pages
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
-            if(firstRender)
+            if (firstRender)
             {
                 _module = await LoadModuleAsync();
                 await StartWatchAsync();
@@ -46,13 +44,14 @@ namespace Beacons.Pages
 
         public async Task StartWatchAsync()
         {
-            if(_module is null)
+            if (_module is null)
             {
                 throw new InvalidOperationException("Module not loaded");
             }
 
-            _watchId = await _module.InvokeAsync<int>("startWatch");
-            watching = true;
+            _model.CurrentWatchId = await _module.InvokeAsync<int>("startWatch");
+            _model.Watching = true;
+
             StateHasChanged();
         }
 
@@ -63,37 +62,42 @@ namespace Beacons.Pages
                 throw new InvalidOperationException("Module not loaded");
             }
 
-            await _module.InvokeVoidAsync("stopWatch", _watchId);
-            watching = false;
+            await _module.InvokeVoidAsync("stopWatch", _model.CurrentWatchId);
+            _model.Watching = false;
+
             StateHasChanged();
         }
 
         [JSInvokable]
         public void SetGeoLocationNotAvailable()
         {
-            geoLocationAvailable = false;
+            _model.GeoLocationAvailable = false;
+            StateHasChanged();
         }
 
         [JSInvokable]
         public void SetLatestPosition(Position position)
         {
-            currentPosition = position;
+            _model.CurrentPosition = position;
 
-            var request = new CalculateDistanceRequest()
+            if (beacon != null)
             {
-                CurrentCoords = position.Coords,
-                DestinationCoords = beacon.Coords,
-            };
+                var request = new CalculateDistanceRequest()
+                {
+                    CurrentCoords = position.Coords,
+                    DestinationCoords = beacon.Coords,
+                };
 
-            var response = DistanceCalculator.CalculateDistance(request);
-            _distance = response;
+                var response = DistanceCalculator.CalculateDistance(request);
+                _model.CurrentDistance = response;
+            }
 
             StateHasChanged();
         }
 
         public async ValueTask DisposeAsync()
         {
-            if(_module is not null)
+            if (_module is not null)
             {
                 await _module.DisposeAsync();
             }
@@ -101,12 +105,12 @@ namespace Beacons.Pages
 
         public void ChangeUnit(ChangeEventArgs e)
         {
-            if(e.Value is null)
+            if (e.Value is null)
             {
                 return;
             }
 
-            _displayedIn = Enum.Parse<DistanceUnit>(e.Value.ToString());
+            _model.CurrentUnit = Enum.Parse<DistanceUnit>(e.Value.ToString());
             StateHasChanged();
         }
 

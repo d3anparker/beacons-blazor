@@ -1,4 +1,5 @@
 ﻿using Beacons.Services.Beacons;
+using Beacons.Services.BeaconSharing;
 using Beacons.Services.Distances;
 
 namespace Beacons.Extensions
@@ -9,9 +10,9 @@ namespace Beacons.Extensions
         {
             services
                 .AddTransient<IBeaconService, TestBeaconService>()
+                .AddTransient<IBeaconSharingService, BeaconSharingService>()
                 .AddSingleton<IDistanceCalculator, DistanceCalculator>();
-
-
+                
             return services;
         }
     }

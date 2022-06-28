@@ -1,5 +1,6 @@
 ﻿@page "/beacon/{beaconId:guid}"
 @using Beacons.Models
+@using Humanizer
 
 <h3>Beacon</h3>
 
@@ -16,7 +17,7 @@ else
     </div>
 
 
-    @if (currentPosition is null)
+    @if (_model.CurrentPosition is null)
     {
         <div>
             Current position unknown.
@@ -25,29 +26,29 @@ else
     else
     {
         <div class="mb-3">
-            Current position is: Lat: @currentPosition.Coords.Latitude, Long: @currentPosition.Coords.Longitude
+            Current position is: Lat: @_model.CurrentPosition.Coords.Latitude, Long: @_model.CurrentPosition.Coords.Longitude
         </div>
 
         <div class="mb-3">
-            Distance to target is @currentDistance
+            Distance to target is @_model.CurrentDistanceDescription (accuracy: (@_model.CurrentDistance?.Accuracy.ToMetric()))
         </div>
         <div class="mb-3">
             <input type="radio" class="btn-check" name="options" id="option1"
                 autocomplete="off"
-                checked="@(_displayedIn == DistanceUnit.Metric)"
+                checked="@(_model.CurrentUnit == DistanceUnit.Metric)"
                 @onchange="ChangeUnit"
                 value="@((int)DistanceUnit.Metric)">
             <label class="btn btn-primary" for="option1">KM</label>
 
             <input type="radio" class="btn-check" name="options" id="option2"
                 autocomplete="off"
-                checked="@(_displayedIn == DistanceUnit.Imperial)"
+                checked="@(_model.CurrentUnit == DistanceUnit.Imperial)"
                 @onchange="ChangeUnit"
                 value="@((int)DistanceUnit.Imperial)">
             <label class="btn btn-primary" for="option2">Miles</label>
         </div>        
 
-        @if (watching)
+        @if (_model.Watching)
         {
             <button class="button" @onclick="() => StopWatchAsync()">Stop watching</button>
         }

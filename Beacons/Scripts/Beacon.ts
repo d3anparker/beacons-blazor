@@ -7,7 +7,8 @@ export class Beacon {
         const response = {
             coords: {
                 longitude: position.coords.longitude,
-                latitude: position.coords.latitude
+                latitude: position.coords.latitude,
+                accuracy: position.coords.accuracy
             }
         };
 

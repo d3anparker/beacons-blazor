@@ -6,9 +6,4 @@
         public Coords DestinationCoords { get; set; }
         public DistanceUnit DistanceUnit { get; set; }
     }
-
-    public enum DistanceUnit
-    {
-        Metric, Imperial
-    }
 }
