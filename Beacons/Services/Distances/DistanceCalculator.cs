@@ -12,10 +12,10 @@ namespace Beacons.Services.Distances
         /// <returns></returns>
         public DistanceResponse CalculateDistance(CalculateDistanceRequest request)
         {
-            var lon1 = request.CurrentCoords.Longitude.ToRadians();
-            var lat1 = request.CurrentCoords.Latitude.ToRadians();
-            var lon2 = request.DestinationCoords.Longitude.ToRadians();
-            var lat2 = request.DestinationCoords.Latitude.ToRadians();
+            var lon1 = request.DestinationCoords.Longitude.ToRadians();
+            var lat1 = request.DestinationCoords.Latitude.ToRadians();
+            var lon2 = request.CurrentCoords.Longitude.ToRadians();
+            var lat2 = request.CurrentCoords.Latitude.ToRadians();
 
             // Haversine formula
             double dlon = lon2 - lon1;
