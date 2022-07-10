@@ -1,6 +1,7 @@
 ﻿using Beacons.Models;
 using Beacons.Services.Beacons;
 using Beacons.Services.Distances;
+using Beacons.Services.Location;
 using Beacons.ViewModels;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
@@ -12,6 +13,7 @@ namespace Beacons.Pages
         [Inject] private IJSRuntime Js { get; set; } = default!;
         [Inject] private IBeaconService BeaconService { get; set; }
         [Inject] private IDistanceCalculator DistanceCalculator { get; set; }
+        [Inject] private LocationWatcherFactory LocationWatcherFactory { get; set; }
 
         [Parameter] public Guid BeaconId { get; set; }
 

@@ -1,6 +1,7 @@
 ﻿using Beacons.Services.Beacons;
 using Beacons.Services.BeaconSharing;
 using Beacons.Services.Distances;
+using Beacons.Services.Location;
 
 namespace Beacons.Extensions
 {
@@ -11,7 +12,12 @@ namespace Beacons.Extensions
             services
                 .AddTransient<IBeaconService, TestBeaconService>()
                 .AddTransient<IBeaconSharingService, BeaconSharingService>()
-                .AddSingleton<IDistanceCalculator, DistanceCalculator>();
+                .AddSingleton<IDistanceCalculator, DistanceCalculator>()
+                .AddTransient<Watcher>()
+                .AddSingleton(provider =>
+                {
+                    return new LocationWatcherFactory(provider.GetRequiredService<Watcher>);
+                });
                 
             return services;
         }
