@@ -10,9 +10,11 @@ namespace Beacons.Services.Location
         private readonly IJSRuntime _jsRuntime;
         private IJSObjectReference? _module;
         private int? _currentWatchId;
-        private ISubject<Position>? _subject;
+        private ISubject<Position>? _positionSubject;
+        private ISubject<bool>? _geoLocationAvailableSubject;
 
         public IObservable<Position>? NextPosition { get; private set; }
+        public IObservable<bool>? GeoLocationAvailable { get; private set; }
 
         public Watcher(IJSRuntime jsRuntime)
         {
@@ -31,8 +33,11 @@ namespace Beacons.Services.Location
                 throw new InvalidOperationException("Watcher not initialised");
             }
 
-            _subject = new Subject<Position>();
-            NextPosition = _subject.AsObservable();
+            _positionSubject = new Subject<Position>();
+            NextPosition = _positionSubject.AsObservable();
+
+            _geoLocationAvailableSubject = new Subject<bool>();
+            GeoLocationAvailable = _geoLocationAvailableSubject.AsObservable();
 
             _currentWatchId = await _module.InvokeAsync<int>("startWatch");
         }
@@ -44,18 +49,25 @@ namespace Beacons.Services.Location
                 throw new InvalidOperationException("Watcher not initialised");
             }
 
+            _positionSubject?.OnCompleted();
             await _module.InvokeVoidAsync("stopWatch", _currentWatchId);
         }
 
         [JSInvokable]
-        private void SetLatestPosition(Position position)
+        public void SetLatestPosition(Position position)
         {
-            if (_subject is null)
+            if (_positionSubject is null)
             {
                 throw new InvalidOperationException("Subject not created");
             }
 
-            _subject.OnNext(position);
+            _positionSubject.OnNext(position);
+        }
+
+        [JSInvokable]
+        public void SetGeoLocationNotAvailable()
+        {
+            _geoLocationAvailableSubject?.OnNext(false);
         }
 
         private async Task<IJSObjectReference> LoadModuleAsync()
@@ -66,5 +78,4 @@ namespace Beacons.Services.Location
             return module;
         }
     }
-
 }

@@ -4,7 +4,7 @@
 
 <h3>Beacon</h3>
 
-@if (beacon is null)
+@if (_beacon is null)
 {
     <div>
         No beacon active
@@ -13,7 +13,7 @@
 else
 {
     <div>
-        Active beacon: Lat: @beacon.Coords.Latitude, Long: @beacon.Coords.Longitude
+        Active beacon: Lat: @_beacon.Coords.Latitude, Long: @_beacon.Coords.Longitude
     </div>
 
 

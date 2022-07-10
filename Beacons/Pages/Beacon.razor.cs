@@ -4,23 +4,23 @@ using Beacons.Services.Distances;
 using Beacons.Services.Location;
 using Beacons.ViewModels;
 using Microsoft.AspNetCore.Components;
-using Microsoft.JSInterop;
+using System.Reactive.Disposables;
 
 namespace Beacons.Pages
 {
-    public partial class Beacon : ComponentBase, IAsyncDisposable
+    public partial class Beacon : ComponentBase, IDisposable
     {
-        [Inject] private IJSRuntime Js { get; set; } = default!;
         [Inject] private IBeaconService BeaconService { get; set; }
         [Inject] private IDistanceCalculator DistanceCalculator { get; set; }
         [Inject] private LocationWatcherFactory LocationWatcherFactory { get; set; }
 
         [Parameter] public Guid BeaconId { get; set; }
 
-        private Models.Beacon? beacon;
+        private Models.Beacon? _beacon;
         private readonly BeaconViewModel _model;
 
-        private IJSObjectReference? _module;
+        private Watcher? _watcher;
+        private CompositeDisposable _subscriptions;
 
         public Beacon()
         {
@@ -28,81 +28,70 @@ namespace Beacons.Pages
             {
                 GeoLocationAvailable = true
             };
+            _subscriptions = new CompositeDisposable();
         }
 
         protected override async Task OnInitializedAsync()
         {
-            beacon = await BeaconService.GetByIdAsync(BeaconId);
+            _beacon = await BeaconService.GetByIdAsync(BeaconId);
         }
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
             if (firstRender)
             {
-                _module = await LoadModuleAsync();
+                _watcher = await LocationWatcherFactory.CreateWatcherAsync();
                 await StartWatchAsync();
             }
         }
 
         public async Task StartWatchAsync()
         {
-            if (_module is null)
+            if(_watcher is null)
             {
-                throw new InvalidOperationException("Module not loaded");
+                throw new InvalidOperationException("Watcher not created");
             }
 
-            _model.CurrentWatchId = await _module.InvokeAsync<int>("startWatch");
-            _model.Watching = true;
+            await _watcher.StartWatchAsync();
+
+            _subscriptions.Clear();
+
+            if (_watcher.NextPosition is not null)
+            {
+                var subscription = _watcher.NextPosition.Subscribe(SetLatestPosition);
+                _subscriptions.Add(subscription);
+
+                _model.Watching = true;
+            }
+
+            if(_watcher.GeoLocationAvailable is not null)
+            {
+                var subscription = _watcher.GeoLocationAvailable.Subscribe(x =>
+                {
+                    _model.GeoLocationAvailable = x;
+
+                    StateHasChanged();
+                });
+
+                _subscriptions.Add(subscription);
+            }
 
             StateHasChanged();
         }
 
         public async Task StopWatchAsync()
         {
-            if (_module is null)
+            if (_watcher is null)
             {
-                throw new InvalidOperationException("Module not loaded");
+                throw new InvalidOperationException("Watcher not created");
             }
 
-            await _module.InvokeVoidAsync("stopWatch", _model.CurrentWatchId);
+            await _watcher.StopWatchAsync();
+
+            _subscriptions.Clear();
             _model.Watching = false;
 
             StateHasChanged();
-        }
-
-        [JSInvokable]
-        public void SetGeoLocationNotAvailable()
-        {
-            _model.GeoLocationAvailable = false;
-            StateHasChanged();
-        }
-
-        [JSInvokable]
-        public void SetLatestPosition(Position position)
-        {
-            _model.CurrentPosition = position;
-
-            if (beacon != null)
-            {
-                var request = new CalculateDistanceRequest()
-                {
-                    CurrentCoords = position.Coords,
-                    DestinationCoords = beacon.Coords,
-                };
-
-                var response = DistanceCalculator.CalculateDistance(request);
-                _model.CurrentDistance = response;
-            }
-
-            StateHasChanged();
-        }
-
-        public async ValueTask DisposeAsync()
-        {
-            if (_module is not null)
-            {
-                await _module.DisposeAsync();
-            }
         }
 
         public void ChangeUnit(ChangeEventArgs e)
@@ -116,12 +105,28 @@ namespace Beacons.Pages
             StateHasChanged();
         }
 
-        private async Task<IJSObjectReference> LoadModuleAsync()
+        public void Dispose()
         {
-            var module = await Js.InvokeAsync<IJSObjectReference>("import", "./js/main.js");
-            await module.InvokeVoidAsync("initialise", DotNetObjectReference.Create(this));
+            _subscriptions.Dispose();
+        }
 
-            return module;
+        private void SetLatestPosition(Position position)
+        {
+            _model.CurrentPosition = position;
+
+            if (_beacon != null)
+            {
+                var request = new CalculateDistanceRequest()
+                {
+                    CurrentCoords = position.Coords,
+                    DestinationCoords = _beacon.Coords,
+                };
+
+                var response = DistanceCalculator.CalculateDistance(request);
+                _model.CurrentDistance = response;
+            }
+
+            StateHasChanged();
         }
     }
 }
