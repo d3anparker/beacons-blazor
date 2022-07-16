@@ -1,5 +1,6 @@
 ﻿using Beacons.Services.Beacons;
 using Beacons.Services.BeaconSharing;
+using Beacons.Services.Client;
 using Beacons.Services.Distances;
 using Beacons.Services.Location;
 
@@ -18,7 +19,12 @@ namespace Beacons.Extensions
                 {
                     return new LocationWatcherFactory(provider.GetRequiredService<Watcher>);
                 });
-                
+
+            services.AddHttpClient<IApiClient, ApiClient>(x =>
+            {
+                x.BaseAddress = new Uri("");
+            });
+
             return services;
         }
     }

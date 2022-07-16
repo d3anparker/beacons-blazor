@@ -1,11 +1,14 @@
 ﻿@page "/create"
 @using Beacons.Models
 @using Beacons.Services.BeaconSharing
+@using Beacons.Services.Beacons
 @inject IBeaconSharingService _beaconSharingService;
+@inject IBeaconService _beaconService;
 @inject NavigationManager _navigationManager;
 
 <h3>CreateBeacon</h3>
 
+<button type="button" @onclick="(e) => Create(e)">Create</button>
 <button type="button" @onclick="(e) => Click(e)">Share</button>
 
 @code {
@@ -19,5 +22,10 @@
         };
 
         await _beaconSharingService.ShareBeaconAsync(request);
+    }
+
+    public async Task Create(MouseEventArgs e)
+    {
+        await _beaconService.CreateAsync(new Services.Client.BeaconCreateRequest());
     }
 }

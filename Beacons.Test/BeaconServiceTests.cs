@@ -9,7 +9,7 @@ namespace Beacons.Test
         [SetUp]
         public void Setup()
         {
-            _sut = new BeaconService();
+            _sut = new BeaconService(null);
         }
 
         [Test]

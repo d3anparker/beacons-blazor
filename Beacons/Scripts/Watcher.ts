@@ -1,7 +1,7 @@
 ﻿import { DotNetObject } from "./DotNetObject.js";
 
-export class Beacon {
-    constructor(private beacon: DotNetObject) { }
+export class Watcher {
+    constructor(private watcher: DotNetObject) { }
 
     public setPosition = async (position: GeolocationPosition) => {
         const response = {
@@ -12,10 +12,10 @@ export class Beacon {
             }
         };
 
-        return await this.beacon.invokeMethodAsync("SetLatestPosition", response);
+        return await this.watcher.invokeMethodAsync("SetLatestPosition", response);
     }
 
     public setGeoLocationUnavailable = async () => {
-        return await this.beacon.invokeMethodAsync("SetGeoLocationNotAvailable");
+        return await this.watcher.invokeMethodAsync("SetGeoLocationNotAvailable");
     }
 }

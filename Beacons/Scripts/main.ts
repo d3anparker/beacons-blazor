@@ -1,11 +1,11 @@
-﻿import { Beacon } from './Beacon.js';
+﻿import { Watcher } from './Watcher.js';
 import { DotNetObject } from './DotNetObject.js';
 import { WatchHandler } from './WatchHandler.js';
 
 let handler: WatchHandler
 
-export function initialise(beacon: DotNetObject) {
-    handler = new WatchHandler(new Beacon(beacon), window.navigator);
+export function initialise(watcher: DotNetObject) {
+    handler = new WatchHandler(new Watcher(watcher), window.navigator);
 }
 
 export function startWatch() {

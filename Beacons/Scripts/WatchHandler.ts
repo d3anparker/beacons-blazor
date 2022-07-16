@@ -1,4 +1,4 @@
-﻿import { Beacon } from "./Beacon.js";
+﻿import { Watcher } from "./Watcher.js";
 
 export class WatchHandler {
     private readonly _options: PositionOptions = {
@@ -6,12 +6,12 @@ export class WatchHandler {
         maximumAge: 5000 // 5 seconds.
     };
 
-    constructor(private beacon: Beacon, private navigator: Navigator) {
+    constructor(private watcher: Watcher, private navigator: Navigator) {
     }  
 
     public startWatch = async () : Promise<number> => {
         if (!this.navigator.geolocation) {
-            await this.beacon.setGeoLocationUnavailable();
+            await this.watcher.setGeoLocationUnavailable();
 
             return -1;
         }
@@ -25,5 +25,5 @@ export class WatchHandler {
         this.navigator.geolocation.clearWatch(id);
     }
 
-    private setPosition = (position: GeolocationPosition) => this.beacon.setPosition(position);
+    private setPosition = (position: GeolocationPosition) => this.watcher.setPosition(position);
 }
