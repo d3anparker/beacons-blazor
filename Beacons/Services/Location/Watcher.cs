@@ -10,15 +10,26 @@ namespace Beacons.Services.Location
         private readonly IJSRuntime _jsRuntime;
         private IJSObjectReference? _module;
         private int? _currentWatchId;
-        private ISubject<Position>? _positionSubject;
-        private ISubject<bool>? _geoLocationAvailableSubject;
+        private readonly ISubject<Position> _positionSubject;
+        private readonly ISubject<bool> _geoLocationAvailableSubject;
 
-        public IObservable<Position>? NextPosition { get; private set; }
-        public IObservable<bool>? GeoLocationAvailable { get; private set; }
+        public IObservable<Position> NextPosition { get; }
+        public IObservable<bool> GeoLocationAvailable { get; }
+
+        /// <summary>
+        /// True if this Watcher has finished watching for changes and should be disposed.
+        /// </summary>
+        public bool Completed { get; private set; }
 
         public Watcher(IJSRuntime jsRuntime)
         {
             _jsRuntime = jsRuntime;
+
+            _positionSubject = new Subject<Position>();
+            NextPosition = _positionSubject.AsObservable();
+
+            _geoLocationAvailableSubject = new Subject<bool>();
+            GeoLocationAvailable = _geoLocationAvailableSubject.AsObservable();
         }
 
         public async Task InitialiseAsync()
@@ -33,11 +44,10 @@ namespace Beacons.Services.Location
                 throw new InvalidOperationException("Watcher not initialised");
             }
 
-            _positionSubject = new Subject<Position>();
-            NextPosition = _positionSubject.AsObservable();
-
-            _geoLocationAvailableSubject = new Subject<bool>();
-            GeoLocationAvailable = _geoLocationAvailableSubject.AsObservable();
+            if (Completed)
+            {
+                throw new InvalidOperationException("Watcher already completed");
+            }
 
             _currentWatchId = await _module.InvokeAsync<int>("startWatch");
         }
@@ -49,25 +59,39 @@ namespace Beacons.Services.Location
                 throw new InvalidOperationException("Watcher not initialised");
             }
 
-            _positionSubject?.OnCompleted();
+            if (Completed)
+            {
+                throw new InvalidOperationException("Watcher already completed");
+            }
+
+            _positionSubject.OnCompleted();
             await _module.InvokeVoidAsync("stopWatch", _currentWatchId);
+
+            Completed = true;
         }
 
         [JSInvokable]
         public void SetLatestPosition(Position position)
         {
-            if (_positionSubject is null)
-            {
-                throw new InvalidOperationException("Subject not created");
-            }
-
             _positionSubject.OnNext(position);
         }
 
         [JSInvokable]
         public void SetGeoLocationNotAvailable()
         {
-            _geoLocationAvailableSubject?.OnNext(false);
+            _geoLocationAvailableSubject.OnNext(false);
+            _geoLocationAvailableSubject.OnCompleted();
+
+            Completed = true;
+        }
+
+        [JSInvokable]
+        public void SetGeoLocationError(LocationError error)
+        {
+            _positionSubject.OnError(new Exception(error.Message));
+            _positionSubject.OnCompleted();
+
+            Completed = true;
         }
 
         private async Task<IJSObjectReference> LoadModuleAsync()
@@ -77,5 +101,10 @@ namespace Beacons.Services.Location
 
             return module;
         }
+    }
+
+    public class LocationError
+    {
+        public string Message { get; set; } = string.Empty;
     }
 }

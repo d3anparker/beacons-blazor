@@ -18,4 +18,12 @@ export class Watcher {
     public setGeoLocationUnavailable = async () => {
         return await this.watcher.invokeMethodAsync("SetGeoLocationNotAvailable");
     }
+
+    public setGeoLocationError = async (error: GeolocationPositionError) => {
+        const response = {
+            message: error.message
+        };
+
+        return await this.watcher.invokeMethodAsync("SetGeoLocationError", response);
+    }
 }

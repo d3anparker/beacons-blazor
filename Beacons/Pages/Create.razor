@@ -1,0 +1,28 @@
+﻿@page "/create"
+
+<h3>Create a beacon</h3>
+
+<p>Create a beacon for your current location. You can then send the details of the beacon to the people you want to come and find you!</p>
+
+@if (!_model.GeolocationAvailable)
+{
+    <p class="alert alert-danger">Geolocation not available</p>
+}
+else if (!string.IsNullOrEmpty(_model.Error))
+{
+    <p class="alert alert-danger">@_model.Error</p>
+}
+else
+{
+    @if (_model.Position is null)
+    {
+        <p>Unknown position</p>
+    }
+    else
+    {
+        <p>Current location: @_model.Position.Coords</p>
+
+        <button type="button" @onclick="(e) => CreateBeacon(e)">Create</button>
+        <button type="button" @onclick="(e) => Share(e)">Share</button>
+    }
+}

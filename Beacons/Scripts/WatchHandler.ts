@@ -17,7 +17,7 @@ export class WatchHandler {
         }
 
         return this.navigator.geolocation.watchPosition(this.setPosition,
-            () => { },
+            this.setPositionError,
             this._options);
     }
 
@@ -26,4 +26,5 @@ export class WatchHandler {
     }
 
     private setPosition = (position: GeolocationPosition) => this.watcher.setPosition(position);
+    private setPositionError = (error: GeolocationPositionError) => this.watcher.setGeoLocationError(error);
 }
