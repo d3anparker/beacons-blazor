@@ -2,10 +2,10 @@
 {
     public class BeaconCreationResponse
     {
-        public Beacon Beacon { get; }
+        public BeaconModel Beacon { get; }
         public string Url { get; }
 
-        public BeaconCreationResponse(Beacon beacon, string url)
+        public BeaconCreationResponse(BeaconModel beacon, string url)
         {
             Beacon = beacon;
             Url = url;

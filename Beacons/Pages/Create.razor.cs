@@ -1,21 +1,25 @@
 ﻿using Beacons.Models;
+using Beacons.Models.Api;
 using Beacons.Services.Beacons;
 using Beacons.Services.BeaconSharing;
 using Beacons.Services.Location;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
+using System.Reactive.Disposables;
 
 namespace Beacons.Pages
 {
-    public partial class Create : ComponentBase
+    public partial class Create : ComponentBase, IDisposable
     {
-        [Inject] private IBeaconSharingService BeaconSharingService { get; set; }
-        [Inject] private IBeaconService BeaconService { get; set; }
-        [Inject] private NavigationManager NavigationManager { get; set; }
+        [Inject] private IBeaconSharingService BeaconSharingService { get; set; } = default!;
+        [Inject] private IBeaconService BeaconService { get; set; } = default!;
+        [Inject] private NavigationManager NavigationManager { get; set; } = default!;
 
-        [Inject] private LocationWatcherFactory LocationWatcherFactory { get; set; }
+        [Inject] private LocationWatcherFactory LocationWatcherFactory { get; set; } = default!;
 
         private readonly CreateViewModel _model;
+
+        private readonly CompositeDisposable _subscriptions;
 
         public Create()
         {
@@ -23,35 +27,70 @@ namespace Beacons.Pages
             {
                 GeolocationAvailable = true
             };
+            _subscriptions = new CompositeDisposable();
         }
 
-        protected override async Task OnInitializedAsync()
+        protected override async Task OnAfterRenderAsync(bool firstRender)
         {
-            var watcher = await LocationWatcherFactory.CreateWatcherAsync();
+            if(firstRender)
+            {
+                var watcher = await LocationWatcherFactory.CreateWatcherAsync();
 
-            await watcher.StartWatchAsync();
+                await watcher.StartWatchAsync();
 
-            watcher.NextPosition.Subscribe(SetCurrentPosition, SetPositionError);
-            watcher.GeoLocationAvailable.Subscribe(SetGeoLocationAvailable);
+                _subscriptions.Add(watcher.NextPosition.Subscribe(SetCurrentPosition, SetPositionError));
+                _subscriptions.Add(watcher.GeoLocationAvailable.Subscribe(SetGeoLocationAvailable));
+            }
 
-            await base.OnInitializedAsync();
+            await base.OnAfterRenderAsync(firstRender);
         }
 
-        public async Task Share(MouseEventArgs e)
+        public void Dispose()
+        {
+            _subscriptions.Dispose();
+        }
+
+        public async Task CreateBeacon(MouseEventArgs e)
+        {
+            if(_model.Position is null)
+            {
+                return;
+            }
+
+            SetCreating(true);
+
+            var model = new BeaconModel()
+            {
+                Latitude = _model.Position.Coords.Latitude,
+                Longitude = _model.Position.Coords.Longitude
+            };
+
+            var response = await BeaconService.CreateAsync(new BeaconCreateRequest(model));
+
+            SetCreating(false);
+
+            if (response?.Beacon is not null)
+            {
+                await ShareBeaconAsync(response.Beacon.Id);
+            }
+        }
+
+        private void SetCreating(bool creating)
+        {
+            _model.Creating = creating;
+            StateHasChanged();
+        }
+
+        private async Task ShareBeaconAsync(Guid id)
         {
             var request = new ShareDataRequest
             {
                 Title = "Come and find me!",
                 Text = "I'll be waiting here!",
-                Url = NavigationManager.ToAbsoluteUri($"/beacon/{Guid.NewGuid()}").ToString()
+                Url = NavigationManager.ToAbsoluteUri($"/beacon/{id}").ToString()
             };
 
             await BeaconSharingService.ShareBeaconAsync(request);
-        }
-
-        public async Task CreateBeacon(MouseEventArgs e)
-        {
-            await BeaconService.CreateAsync(new Services.Client.BeaconCreateRequest());
         }
 
         private void SetCurrentPosition(Position position)

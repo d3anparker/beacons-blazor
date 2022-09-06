@@ -1,6 +1,5 @@
 ﻿using Beacons.Models;
 using Beacons.Models.Api;
-using Beacons.Services.Client;
 
 namespace Beacons.Services.Beacons
 {

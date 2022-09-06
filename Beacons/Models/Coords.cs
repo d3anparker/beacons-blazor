@@ -8,7 +8,7 @@
 
         public override string ToString()
         {
-            return $"{Latitude}, {Longitude}, accurate to {Accuracy:N2}m";
+            return $"{Latitude:N3}, {Longitude:N3}, accurate to {Accuracy:N2}m";
         }
     }
 }

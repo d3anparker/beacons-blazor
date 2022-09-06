@@ -22,7 +22,12 @@ else
     {
         <p>Current location: @_model.Position.Coords</p>
 
-        <button type="button" @onclick="(e) => CreateBeacon(e)">Create</button>
-        <button type="button" @onclick="(e) => Share(e)">Share</button>
+        <button class="btn btn-primary" type="button" @onclick="(e) => CreateBeacon(e)" disabled="@_model.Creating">
+            Create
+            @if (_model.Creating)
+            {
+                <span class="spinner-border spinner-border-sm ms-1" role="status" aria-hidden="true"></span>
+            }
+        </button>
     }
 }

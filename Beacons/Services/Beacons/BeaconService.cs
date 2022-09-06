@@ -27,7 +27,6 @@ namespace Beacons.Services.Beacons
                 return response.Data!;
             }
 
-
             // TODO. Something sensible here!
             return new BeaconCreationResponse(null, null);
         }
