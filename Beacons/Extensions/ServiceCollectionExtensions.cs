@@ -12,7 +12,7 @@ namespace Beacons.Extensions
         public static IServiceCollection AddBeaconServices(this IServiceCollection services)
         {
             services
-                .AddTransient<IBeaconService, TestBeaconService>()
+                .AddTransient<IBeaconService, BeaconService>()
                 .AddTransient<IBeaconSharingService, BeaconSharingService>()
                 .AddSingleton<IDistanceCalculator, DistanceCalculator>()
                 .AddSingleton<IBeaconConfiguration, BeaconConfiguration>()
