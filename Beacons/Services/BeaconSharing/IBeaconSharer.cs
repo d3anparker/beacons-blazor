@@ -2,7 +2,7 @@
 
 namespace Beacons.Services.BeaconSharing
 {
-    public interface IBeaconSharingService
+    public interface IBeaconSharer
     {
         Task<ShareDataResponse> ShareBeaconAsync(ShareDataRequest request);
     }

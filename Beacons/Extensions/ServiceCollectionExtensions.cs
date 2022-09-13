@@ -13,10 +13,10 @@ namespace Beacons.Extensions
         {
             services
                 .AddTransient<IBeaconService, BeaconService>()
-                .AddTransient<IBeaconSharingService, BeaconSharingService>()
                 .AddSingleton<IDistanceCalculator, DistanceCalculator>()
                 .AddSingleton<IBeaconConfiguration, BeaconConfiguration>()
                 .AddTransient<Watcher>()
+                .AddSingleton<BeaconSharerFactory>()
                 .AddSingleton(provider =>
                 {
                     return new LocationWatcherFactory(provider.GetRequiredService<Watcher>);

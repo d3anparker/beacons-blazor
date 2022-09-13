@@ -3,26 +3,26 @@ using Microsoft.JSInterop;
 
 namespace Beacons.Services.BeaconSharing
 {
-    public class BeaconSharingService : IBeaconSharingService
+    public class BeaconSharer : IBeaconSharer
     {
         private readonly IJSRuntime _jsRuntime;
         private IJSObjectReference? _shareModule;
 
-        public BeaconSharingService(IJSRuntime jsRuntime)
+        public BeaconSharer(IJSRuntime jsRuntime)
         {
             _jsRuntime = jsRuntime;
         }
 
+        public async Task InitialiseAsync()
+        {
+            _shareModule = await _jsRuntime.InvokeAsync<IJSObjectReference>("import", "./js/Share.js");
+        }
+
         public async Task<ShareDataResponse> ShareBeaconAsync(ShareDataRequest request)
         {
-            while (_shareModule == null)
+            if(_shareModule == null)
             {
-                var loaded = await LoadModuleAsync();
-
-                if(!loaded)
-                {
-                    return new ShareDataResponse();
-                }
+                throw new InvalidOperationException($"{nameof(BeaconSharer)} not initialised");
             }
 
             try
@@ -35,13 +35,6 @@ namespace Beacons.Services.BeaconSharing
             }
 
             return new ShareDataResponse();
-        }
-
-        private async Task<bool> LoadModuleAsync()
-        {
-            _shareModule = await _jsRuntime.InvokeAsync<IJSObjectReference>("import", "./js/Share.js");
-
-            return _shareModule != null;
         }
     }
 }

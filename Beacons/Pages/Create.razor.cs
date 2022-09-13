@@ -11,7 +11,7 @@ namespace Beacons.Pages
 {
     public partial class Create : ComponentBase, IDisposable
     {
-        [Inject] private IBeaconSharingService BeaconSharingService { get; set; } = default!;
+        [Inject] private BeaconSharerFactory BeaconSharerFactory { get; set; } = default!;
         [Inject] private IBeaconService BeaconService { get; set; } = default!;
         [Inject] private NavigationManager NavigationManager { get; set; } = default!;
 
@@ -83,6 +83,8 @@ namespace Beacons.Pages
 
         private async Task ShareBeaconAsync(Guid id)
         {
+            var sharer = await BeaconSharerFactory.CreateBeaconSharerAsync();
+
             var request = new ShareDataRequest
             {
                 Title = "Come and find me!",
@@ -90,7 +92,7 @@ namespace Beacons.Pages
                 Url = NavigationManager.ToAbsoluteUri($"/beacon/{id}").ToString()
             };
 
-            await BeaconSharingService.ShareBeaconAsync(request);
+            await sharer.ShareBeaconAsync(request);
         }
 
         private void SetCurrentPosition(Position position)
