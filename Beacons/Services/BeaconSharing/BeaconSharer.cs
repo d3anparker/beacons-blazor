@@ -3,10 +3,10 @@ using Microsoft.JSInterop;
 
 namespace Beacons.Services.BeaconSharing
 {
-    public class BeaconSharer : IBeaconSharer
+    public class BeaconSharer : IInitialisableBeaconSharer
     {
         private readonly IJSRuntime _jsRuntime;
-        private IJSObjectReference? _shareModule;
+        private IJSObjectReference? _sharerInstance;
 
         public BeaconSharer(IJSRuntime jsRuntime)
         {
@@ -15,19 +15,20 @@ namespace Beacons.Services.BeaconSharing
 
         public async Task InitialiseAsync()
         {
-            _shareModule = await _jsRuntime.InvokeAsync<IJSObjectReference>("import", "./js/Share.js");
+            var shareModule = await _jsRuntime.InvokeAsync<IJSObjectReference>("import", "./js/main.js");
+            _sharerInstance = await shareModule.InvokeAsync<IJSObjectReference>("createSharer");
         }
 
         public async Task<ShareDataResponse> ShareBeaconAsync(ShareDataRequest request)
         {
-            if(_shareModule == null)
+            if(_sharerInstance == null)
             {
                 throw new InvalidOperationException($"{nameof(BeaconSharer)} not initialised");
             }
 
             try
             {
-                await _shareModule.InvokeVoidAsync("share", request);
+                await _sharerInstance.InvokeVoidAsync("share", request);
             }
             catch (Exception e)
             {

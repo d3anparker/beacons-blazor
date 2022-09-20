@@ -5,7 +5,7 @@
     "noImplicitAny": true,
     "noEmitOnError": true,
     "removeComments": false,
-    "sourceMap": true,
+    "inlineSourceMap": true,
     "target": "ES2017",
     "outDir": "wwwroot/js",
     "lib": [ "ES2015", "DOM" ],

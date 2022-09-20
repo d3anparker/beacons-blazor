@@ -8,7 +8,7 @@ namespace Beacons.Services.Location
     public class Watcher
     {
         private readonly IJSRuntime _jsRuntime;
-        private IJSObjectReference? _module;
+        private IJSObjectReference? _instance;
         private int? _currentWatchId;
         private readonly ISubject<Position> _positionSubject;
         private readonly ISubject<bool> _geoLocationAvailableSubject;
@@ -34,12 +34,12 @@ namespace Beacons.Services.Location
 
         public async Task InitialiseAsync()
         {
-            _module = await LoadModuleAsync();
+            _instance = await LoadModuleAsync();
         }
 
         public async Task StartWatchAsync()
         {
-            if (_module is null)
+            if (_instance is null)
             {
                 throw new InvalidOperationException("Watcher not initialised");
             }
@@ -49,12 +49,12 @@ namespace Beacons.Services.Location
                 throw new InvalidOperationException("Watcher already completed");
             }
 
-            _currentWatchId = await _module.InvokeAsync<int>("startWatch");
+            _currentWatchId = await _instance.InvokeAsync<int>("startWatch");
         }
 
         public async Task StopWatchAsync()
         {
-            if (_module is null)
+            if (_instance is null)
             {
                 throw new InvalidOperationException("Watcher not initialised");
             }
@@ -65,7 +65,7 @@ namespace Beacons.Services.Location
             }
 
             _positionSubject.OnCompleted();
-            await _module.InvokeVoidAsync("stopWatch", _currentWatchId);
+            await _instance.InvokeVoidAsync("stopWatch", _currentWatchId);
 
             Completed = true;
         }
@@ -97,14 +97,9 @@ namespace Beacons.Services.Location
         private async Task<IJSObjectReference> LoadModuleAsync()
         {
             var module = await _jsRuntime.InvokeAsync<IJSObjectReference>("import", "./js/main.js");
-            await module.InvokeVoidAsync("initialise", DotNetObjectReference.Create(this));
+            var instance = await module.InvokeAsync<IJSObjectReference>("createWatchHandler", DotNetObjectReference.Create(this));
 
-            return module;
+            return instance;
         }
-    }
-
-    public class LocationError
-    {
-        public string Message { get; set; } = string.Empty;
     }
 }

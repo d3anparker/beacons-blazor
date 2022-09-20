@@ -1,19 +1,17 @@
-﻿using Microsoft.JSInterop;
-
-namespace Beacons.Services.BeaconSharing
+﻿namespace Beacons.Services.BeaconSharing
 {
     public class BeaconSharerFactory
     {
-        private readonly IJSRuntime _jSRuntime;
+        private readonly Func<IInitialisableBeaconSharer> _createBeaconSharer;
 
-        public BeaconSharerFactory(IJSRuntime jSRuntime)
+        public BeaconSharerFactory(Func<IInitialisableBeaconSharer> createBeaconSharer)
         {
-            _jSRuntime = jSRuntime;
+            _createBeaconSharer = createBeaconSharer;
         }
 
         public async Task<IBeaconSharer> CreateBeaconSharerAsync()
         {
-            var service = new BeaconSharer(_jSRuntime);
+            var service = _createBeaconSharer();
             await service.InitialiseAsync();
 
             return service;

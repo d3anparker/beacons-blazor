@@ -52,7 +52,7 @@ namespace Beacons.Pages
 
         public async Task CreateBeacon(MouseEventArgs e)
         {
-            if(_model.Position is null)
+            if (_model.Position is null)
             {
                 return;
             }

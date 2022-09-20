@@ -16,7 +16,11 @@ namespace Beacons.Extensions
                 .AddSingleton<IDistanceCalculator, DistanceCalculator>()
                 .AddSingleton<IBeaconConfiguration, BeaconConfiguration>()
                 .AddTransient<Watcher>()
-                .AddSingleton<BeaconSharerFactory>()
+                .AddTransient<IInitialisableBeaconSharer, BeaconSharer>()
+                .AddSingleton(provider =>
+                {
+                    return new BeaconSharerFactory(provider.GetRequiredService<IInitialisableBeaconSharer>);
+                })
                 .AddSingleton(provider =>
                 {
                     return new LocationWatcherFactory(provider.GetRequiredService<Watcher>);
