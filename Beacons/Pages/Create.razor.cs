@@ -71,6 +71,7 @@ namespace Beacons.Pages
 
             if (response?.Beacon is not null)
             {
+                _model.ShowMap = true;
                 await ShareBeaconAsync(response.Beacon.Id);
             }
         }

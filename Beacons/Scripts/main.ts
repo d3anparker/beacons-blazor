@@ -1,4 +1,5 @@
-﻿import { DotNetObject } from "./DotNetObject.js";
+﻿import { BeaconMap } from "./BeaconMap.js";
+import { DotNetObject } from "./DotNetObject.js";
 import { Sharer } from "./Sharer.js";
 import { Watcher } from "./Watcher.js";
 import { WatchHandler } from "./WatchHandler.js";
@@ -9,4 +10,8 @@ export function createWatchHandler(watcher: DotNetObject): WatchHandler {
 
 export function createSharer(): Sharer {
     return new Sharer(window.navigator);
+}
+
+export function createMap(mapId: string): BeaconMap {
+    return new BeaconMap(mapId);
 }

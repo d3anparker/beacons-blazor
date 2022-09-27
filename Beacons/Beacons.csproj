@@ -13,10 +13,15 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Remove="Pages\Map.razor.css" />
+  </ItemGroup>
+
+  <ItemGroup>
     <TypeScriptCompile Remove="Scripts\WatchHandler.ts" />
   </ItemGroup>
 
   <ItemGroup>
+    <Content Include="Pages\Map.razor.css" />
     <Content Include="Scripts\WatchHandler.ts" />
   </ItemGroup>
 

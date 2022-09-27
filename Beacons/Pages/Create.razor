@@ -22,6 +22,8 @@ else
     {
         <p>Current location: @_model.Position.Coords</p>
 
+        <p><Map MapId="map" Longtitude="_model.Position.Coords.Longitude" Latitude="_model.Position.Coords.Latitude"></Map></p>
+
         <button class="btn btn-primary" type="button" @onclick="(e) => CreateBeacon(e)" disabled="@_model.Creating">
             Create
             @if (_model.Creating)
