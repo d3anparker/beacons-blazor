@@ -1,0 +1,24 @@
+﻿@inject IJSRuntime JsRuntime
+
+<div id="@MapId" class="map">
+</div>
+
+@code {
+    [Parameter]
+    public string MapId { get; set; } = Guid.NewGuid().ToString();
+    [Parameter]
+    public double Longtitude { get; set; } = 0.0;
+    [Parameter]
+    public double Latitude { get; set; } = 0.0;
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        var module = await JsRuntime.InvokeAsync<IJSObjectReference>("import", "./js/main.js");
+        var map = await module.InvokeAsync<IJSObjectReference>("createMap", MapId);
+
+        await map.InvokeVoidAsync("updateMap", Latitude, Longtitude);
+
+        await base.OnInitializedAsync();
+    }
+}
