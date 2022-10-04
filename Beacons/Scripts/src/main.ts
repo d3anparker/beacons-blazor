@@ -1,8 +1,8 @@
-﻿import { BeaconMap } from "./BeaconMap.js";
-import { DotNetObject } from "./DotNetObject.js";
-import { Sharer } from "./Sharer.js";
-import { Watcher } from "./Watcher.js";
-import { WatchHandler } from "./WatchHandler.js";
+﻿import { BeaconMap } from "./BeaconMap";
+import { DotNetObject } from "./DotNetObject";
+import { Sharer } from "./Sharer";
+import { Watcher } from "./Watcher";
+import { WatchHandler } from "./WatchHandler";
 
 export function createWatchHandler(watcher: DotNetObject): WatchHandler {
     return new WatchHandler(new Watcher(watcher), window.navigator);

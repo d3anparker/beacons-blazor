@@ -1,4 +1,4 @@
-﻿import { DotNetObject } from "./DotNetObject.js";
+﻿import { DotNetObject } from "./DotNetObject";
 
 export class Watcher {
     constructor(private watcher: DotNetObject) { }

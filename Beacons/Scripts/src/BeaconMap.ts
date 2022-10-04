@@ -1,20 +1,19 @@
-﻿declare var L: any;
-//import * as L from 'leaflet';
+﻿import * as L from 'leaflet';
 
 export class BeaconMap {
-    constructor(private mapId: string) {
+    private map: L.Map;
+    constructor(mapId: string) {
+        this.map = L.map(mapId);      
     }
 
     public updateMap = (lat: number, lng: number) => {
-        const map = L.map(this.mapId);        
-        
-        map.setView([lat, lng], 13);
+        this.map.setView([lat, lng], 13);
 
         L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
             maxZoom: 13,
             attribution: '© OpenStreetMap',
-        }).addTo(map);
+        }).addTo(this.map);
 
-        L.marker([lat, lng]).addTo(map);
+        L.marker([lat, lng]).addTo(this.map);
     }
 }
