@@ -22,7 +22,7 @@
 
   <ItemGroup>
     <Content Include="Pages\Map.razor.css" />
-    <Content Include="Scripts\WatchHandler.ts" />
+    <Content Include="Scripts\src\WatchHandler.ts" />
   </ItemGroup>
 
   <ItemGroup>
@@ -42,7 +42,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="Scripts\WatchHandler.ts" />
+    <None Include="Scripts\src\WatchHandler.ts" />
   </ItemGroup>
 
   <ItemGroup>

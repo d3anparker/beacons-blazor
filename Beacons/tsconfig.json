@@ -11,12 +11,9 @@
     "lib": [ "ES2015", "DOM" ],
     "module": "ES2015",
     "moduleResolution": "node",
-    "baseUrl": "./Scripts/",
-    "paths": {
-      "https://unpkg.com/leaflet@1.9.1/dist/leaflet": ["leaflet"]
-    }
+    "baseUrl": "./Scripts/"
   },
   "include": [
-    "Scripts/**/*"
+    "Scripts/src/**/*"
   ]
 }
