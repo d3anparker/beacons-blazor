@@ -6,7 +6,16 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <ServiceWorkerAssetsManifest>service-worker-assets.js</ServiceWorkerAssetsManifest>
     <TypeScriptModuleKind>commonjs</TypeScriptModuleKind>
+	<TypeScriptCompileBlocked>true</TypeScriptCompileBlocked>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="%2a%2a\**" />
+    <Content Remove="%2a%2a\**" />
+    <EmbeddedResource Remove="%2a%2a\**" />
+    <None Remove="%2a%2a\**" />
+    <TypeScriptCompile Remove="%2a%2a\**" />
+  </ItemGroup>
 
   <ItemGroup>
     <Content Remove="tsconfig.json" />
@@ -14,6 +23,7 @@
 
   <ItemGroup>
     <None Remove="Pages\Map.razor.css" />
+    <None Remove="Scripts\webpack.config.js" />
   </ItemGroup>
 
   <ItemGroup>

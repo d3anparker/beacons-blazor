@@ -1,4 +1,4 @@
-﻿import { Watcher } from "./Watcher.js";
+﻿import { Watcher } from "./Watcher";
 
 export class WatchHandler {
     private readonly _options: PositionOptions = {
