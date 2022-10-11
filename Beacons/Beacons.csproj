@@ -63,4 +63,9 @@
     <Folder Include="wwwroot\js\" />
   </ItemGroup>
 
+	<Target Name="PreBuild" BeforeTargets="PreBuildEvent">
+		<Exec Command="npm install" WorkingDirectory="Scripts" />
+		<Exec Command="npm run build" WorkingDirectory="Scripts" />
+	</Target>
+
 </Project>
