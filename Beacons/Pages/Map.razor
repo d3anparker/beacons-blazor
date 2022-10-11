@@ -1,4 +1,7 @@
-﻿@inject IJSRuntime JsRuntime
+﻿@using System.Reactive.Subjects
+@using System.Reactive.Linq;
+@implements IDisposable;
+@inject IJSRuntime JsRuntime;
 
 <div id="@MapId" class="map">
 </div>
@@ -11,14 +14,41 @@
     [Parameter]
     public double Latitude { get; set; } = 0.0;
 
+    private ISubject<int?> _refreshMap;
+    private IDisposable? _mapRefreshSubscription;
+
+    public Map()
+    {
+        _refreshMap = new BehaviorSubject<int?>(null);
+    }
 
     protected override async Task OnInitializedAsync()
     {
         var module = await JsRuntime.InvokeAsync<IJSObjectReference>("import", "./js/main.js");
         var map = await module.InvokeAsync<IJSObjectReference>("createMap", MapId);
 
-        await map.InvokeVoidAsync("updateMap", Latitude, Longtitude);
+        _mapRefreshSubscription = _refreshMap.Sample(TimeSpan.FromSeconds(5)) // Only accept a new position every five seconds.
+            .Select(s => Observable.FromAsync(async () => await UpdateMapAsync(map)))
+            .Concat()
+            .Subscribe();
 
+        await UpdateMapAsync(map);
         await base.OnInitializedAsync();
+    }
+
+    public void Dispose()
+    {
+        _mapRefreshSubscription?.Dispose();
+    }
+
+    protected override void OnParametersSet()
+    {
+        _refreshMap?.OnNext(null);
+    }
+
+    private async Task UpdateMapAsync(IJSObjectReference map)
+    {
+        await map.InvokeVoidAsync("updateMap", Latitude, Longtitude);
+        StateHasChanged();
     }
 }
