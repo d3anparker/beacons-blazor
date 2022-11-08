@@ -8,9 +8,9 @@
 {
     <p class="alert alert-danger">Geolocation not available</p>
 }
-else if (!string.IsNullOrEmpty(_model.Error))
+else if (!string.IsNullOrEmpty(_model.PositionError))
 {
-    <p class="alert alert-danger">@_model.Error</p>
+    <p class="alert alert-danger">@_model.PositionError</p>
 }
 else
 {
@@ -31,5 +31,10 @@ else
                 <span class="spinner-border spinner-border-sm ms-1" role="status" aria-hidden="true"></span>
             }
         </button>
+
+        @if (!string.IsNullOrEmpty(_model.CreationError))
+        {
+            <p class="alert alert-danger mt-3">@_model.CreationError</p>
+        }
     }
 }

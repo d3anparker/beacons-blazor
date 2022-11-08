@@ -1,5 +1,4 @@
-﻿using Beacons.Models;
-using Beacons.Models.Api;
+﻿using Beacons.Models.Api;
 using Beacons.Services.Client;
 
 namespace Beacons.Services.Beacons
@@ -13,16 +12,23 @@ namespace Beacons.Services.Beacons
             _apiClient = apiClient;
         }
 
-        public Task<Beacon?> GetByIdAsync(Guid id)
+        public async Task<BeaconModel?> GetByIdAsync(Guid id)
         {
-            return Task.FromResult<Beacon?>(null);
+            var response = await _apiClient.GetAsync(id);
+
+            if(!response.Successful)
+            {
+                return null;
+            }
+
+            return response.Data;
         }
 
         public async Task<BeaconCreationResponse> CreateAsync(BeaconCreateRequest request)
         {
             var response = await _apiClient.CreateAsync(request);
 
-            if(response.Successful)
+            if (response.Successful)
             {
                 return response.Data!;
             }

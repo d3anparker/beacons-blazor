@@ -1,23 +1,19 @@
-﻿using Beacons.Models;
-using Beacons.Models.Api;
+﻿using Beacons.Models.Api;
 
 namespace Beacons.Services.Beacons
 {
     public interface IBeaconService
     {
         Task<BeaconCreationResponse> CreateAsync(BeaconCreateRequest request);
-        Task<Beacon?> GetByIdAsync(Guid id);
+        Task<BeaconModel?> GetByIdAsync(Guid id);
     }
 
     public class TestBeaconService : IBeaconService
     {
-        private Beacon beacon = new Beacon()
+        private BeaconModel beacon = new BeaconModel()
         {
-            Coords = new Coords()
-            {
-                Latitude = 51.8689552,
-                Longitude = 0.1779022
-            }
+            Longitude = 0.1779022,
+            Latitude = 51.8689552
         };
 
         public Task<BeaconCreationResponse> CreateAsync(BeaconCreateRequest request)
@@ -25,6 +21,6 @@ namespace Beacons.Services.Beacons
             return Task.FromResult(new BeaconCreationResponse(null, null));
         }
 
-        public Task<Beacon?> GetByIdAsync(Guid id) => Task.FromResult<Beacon?>(beacon);
+        public Task<BeaconModel?> GetByIdAsync(Guid id) => Task.FromResult<BeaconModel?>(beacon);
     }
 }

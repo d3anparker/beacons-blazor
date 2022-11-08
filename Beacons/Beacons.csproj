@@ -22,6 +22,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Remove="Pages\Create.razor.css" />
     <None Remove="Pages\Map.razor.css" />
     <None Remove="Scripts\webpack.config.js" />
   </ItemGroup>
@@ -31,6 +32,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Content Include="Pages\Create.razor.css" />
     <Content Include="Pages\Map.razor.css" />
     <Content Include="Scripts\src\WatchHandler.ts" />
   </ItemGroup>

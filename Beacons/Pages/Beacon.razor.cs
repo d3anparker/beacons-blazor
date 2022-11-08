@@ -33,7 +33,21 @@ namespace Beacons.Pages
 
         protected override async Task OnInitializedAsync()
         {
-            _beacon = await BeaconService.GetByIdAsync(BeaconId);
+            var beaconModel = await BeaconService.GetByIdAsync(BeaconId);
+
+            if (beaconModel is null)
+            {
+                return;
+            }
+
+            _beacon = new Models.Beacon()
+            {
+                Coords = new Coords
+                {
+                    Latitude = beaconModel.Latitude,
+                    Longitude = beaconModel.Longitude
+                }
+            };
         }
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -47,7 +61,7 @@ namespace Beacons.Pages
 
         public async Task StartWatchAsync()
         {
-            if(_watcher is null)
+            if (_watcher is null)
             {
                 throw new InvalidOperationException("Watcher not created");
             }
@@ -64,7 +78,7 @@ namespace Beacons.Pages
                 _model.Watching = true;
             }
 
-            if(_watcher.GeoLocationAvailable is not null)
+            if (_watcher.GeoLocationAvailable is not null)
             {
                 var subscription = _watcher.GeoLocationAvailable.Subscribe(x =>
                 {

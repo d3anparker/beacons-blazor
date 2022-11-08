@@ -32,7 +32,7 @@ namespace Beacons.Pages
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
-            if(firstRender)
+            if (firstRender)
             {
                 var watcher = await LocationWatcherFactory.CreateWatcherAsync();
 
@@ -57,6 +57,7 @@ namespace Beacons.Pages
                 return;
             }
 
+            _model.CreationError = null;
             SetCreating(true);
 
             var model = new BeaconModel()
@@ -73,6 +74,11 @@ namespace Beacons.Pages
             {
                 _model.ShowMap = true;
                 await ShareBeaconAsync(response.Beacon.Id);
+            }
+            else
+            {
+                _model.CreationError = "Couldn't create beacon";
+                StateHasChanged();
             }
         }
 
@@ -110,7 +116,7 @@ namespace Beacons.Pages
 
         private void SetPositionError(Exception exc)
         {
-            _model.Error = exc.Message;
+            _model.PositionError = exc.Message;
             StateHasChanged();
         }
     }
